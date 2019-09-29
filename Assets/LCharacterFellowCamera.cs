@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LCharacterFellowCamera : MonoBehaviour {
+public class LCharacterFellowCamera : MonoBehaviour
+{
 
- 
+
     public Camera cam;
     public Transform target;
-    
-    
+
+
 
     public float distance = 10f;
     public float xRot = 45f;
@@ -24,14 +25,9 @@ public class LCharacterFellowCamera : MonoBehaviour {
 
     public bool slowly = true;
 
-    //[Header("事件所在层")]
-    //public int eventLayer = 31;
+ 
 
-
-    //target;
-    //SphereCollider sphereCollider = null;
-  
-    float RotTo(float des,float src,float moveDelta)
+    float RotTo(float des, float src, float moveDelta)
     {
         while (des < src)
         {
@@ -47,9 +43,9 @@ public class LCharacterFellowCamera : MonoBehaviour {
         {
             src += 360f;
             delta0 = des - src;
-      
+
         }
-        return  MoveToLerp(des, src, moveDelta) ;
+        return MoveToLerp(des, src, moveDelta);
     }
 
     float MoveToLerp(float des, float src, float moveDelta)
@@ -59,7 +55,7 @@ public class LCharacterFellowCamera : MonoBehaviour {
         {
             return des;
         }
-        
+
         float absDelta = Mathf.Abs(delta);
         float sign = delta > 0 ? 1f : -1;
         if (absDelta < moveDelta)
@@ -70,7 +66,7 @@ public class LCharacterFellowCamera : MonoBehaviour {
         {
             return src + moveDelta * sign;
         }
-        
+
     }
     public void GoToTarget()
     {
@@ -88,7 +84,7 @@ public class LCharacterFellowCamera : MonoBehaviour {
 
 
 
-       
+
         if (slowly)
         {
             cur_xRot = RotTo(xRot, cur_xRot, Time.deltaTime * RotDelta);
@@ -101,8 +97,8 @@ public class LCharacterFellowCamera : MonoBehaviour {
             cur_yRot = yRot;
             cur_distance = distance;
         }
-       
- 
+
+
     }
     public void SetToTarget()
     {
@@ -113,13 +109,14 @@ public class LCharacterFellowCamera : MonoBehaviour {
 
     private void Start()
     {
-  
+
         SetToTarget();
     }
-    
 
-    void LateUpdate () {
-        
+
+    void LateUpdate()
+    {
+
         if (null == cam)
         {
             cam = Camera.main;
@@ -129,7 +126,7 @@ public class LCharacterFellowCamera : MonoBehaviour {
         if (null == target)
             return;
 
-        
+
         /*if (null == sphereCollider)
         {
             GameObject g = new GameObject("ForEvent");
@@ -153,9 +150,9 @@ public class LCharacterFellowCamera : MonoBehaviour {
         cam.transform.position = target.position;
         cam.transform.rotation = Quaternion.identity;
 
-        cam.transform.Rotate(Vector3.up, cur_xRot );
+        cam.transform.Rotate(Vector3.up, cur_xRot);
         cam.transform.Rotate(Vector3.right, cur_yRot);
-        
+
         cam.transform.position = cam.transform.position - cam.transform.forward * cur_distance;
 
 

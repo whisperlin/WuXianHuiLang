@@ -7,7 +7,6 @@
 	}
 		SubShader{
 			Pass {
-			//设置渲染状态
 			ZTest Always Cull Off ZWrite Off
 
 			CGPROGRAM
@@ -34,7 +33,6 @@
 			o.pos = UnityObjectToClipPos(v.vertex);
 
 			half2 uv = v.texcoord;
-			//通过_MainTex_TexelSize.xy值，计算需要计算的矩阵的UV值
 			o.uv[0] = uv + _MainTex_TexelSize.xy * half2(-1, -1);
 			o.uv[1] = uv + _MainTex_TexelSize.xy * half2(0, -1);
 			o.uv[2] = uv + _MainTex_TexelSize.xy * half2(1, -1);
@@ -47,14 +45,11 @@
 
 			return o;
 		}
-		//计算亮度值
 		fixed luminance(fixed4 color) {
 			return  0.2125 * color.r + 0.7154 * color.g + 0.0721 * color.b;
 		}
 
-		//通过Sobe算子算出这个像素点与周围的梯度值
 		half Sobel(v2f i) {
-			//Sobe算子矩阵，分为X与Y两个方向
 			const half Gx[9] = {-1,  0,  1,
 									-2,  0,  2,
 									-1,  0,  1};
@@ -65,13 +60,11 @@
 			half texColor;
 			half edgeX = 0;
 			half edgeY = 0;
-			//累加周围采样点的梯度值
 			for (int it = 0; it < 9; it++) {
 				texColor = luminance(tex2D(_MainTex, i.uv[it]));
 				edgeX += texColor * Gx[it];
 				edgeY += texColor * Gy[it];
 			}
-			//用绝对值代替开根号
 			half edge = 1 - abs(edgeX) - abs(edgeY);
 
 			return edge;
@@ -79,7 +72,6 @@
 
 		fixed4 fragSobel(v2f i) : SV_Target {
 			half edge = Sobel(i);
-		//根据梯度值，将原颜色与背景颜色、描边颜色进行插值运算，得到最终的颜色值
 		fixed4 withEdgeColor = lerp(_EdgeColor, tex2D(_MainTex, i.uv[4]), edge);
 		fixed4 onlyEdgeColor = lerp(_EdgeColor, _BackgroundColor, edge);
 		return lerp(withEdgeColor, onlyEdgeColor, _EdgeOnly);
