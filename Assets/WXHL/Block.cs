@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public struct LVector3Int
+public class LVector3Int
 {
+  
     public int x;
     public int y;
     public int z;
    
 
-    public LVector3Int(int v1, int v2, int v3) : this()
+    public LVector3Int(int v1, int v2, int v3)  
     {
         this.x = v1;
         this.y = v2;
@@ -29,6 +30,7 @@ public class WayPoint
     public LVector3Int pos;
     public Vector3 hitPoint;
     public Vector3[] airPoints  ;
+    public Vector3[] screenPoints;
     [System.NonSerialized]
     public List<WayPoint> connecteds = new List<WayPoint>()  ;
 }
@@ -76,10 +78,16 @@ public class Block : MonoBehaviour {
     }
     private void Start()
     {
+        for (int i = 0, c = points.Count; i < c; i++)
+        {
+            var p = points[i];
+            p.pos = new LVector3Int(SafeInt(p.hitPoint.x), SafeHeight(p.hitPoint.y), SafeInt(p.hitPoint.z));
+        }
         UpdateConnecctPoint();
     }
     public void UpdateConnecctPoint()
     {
+        //
         for (int i = 0, c = points.Count; i < c; i++)
         {
             var wp = points[i];
@@ -89,9 +97,13 @@ public class Block : MonoBehaviour {
                 var wp1 = points[j];
                 if (i == j)
                     continue;
-                if ( Mathf.Abs(wp.pos.x - wp1.pos.x) <= 1
-                    && Mathf.Abs(wp.pos.y - wp1.pos.y) <= 1
-                    && Mathf.Abs(wp.pos.z - wp1.pos.z) <= 1
+                int dx = Mathf.Abs(wp.pos.x - wp1.pos.x) ;
+                int dy = Mathf.Abs(wp.pos.y - wp1.pos.y);
+                int dz = Mathf.Abs(wp.pos.z - wp1.pos.z);
+                Debug.Log((Vector3)wp.pos + " "+(Vector3)wp1.pos+" "+dx + " "+dy + " "+dz );
+                if ( 
+                    (dx + dz ==1)
+                    && dy<=1
                      )
                 {
                     wp.connecteds.Add(wp1);
@@ -145,6 +157,7 @@ public class Block : MonoBehaviour {
                     if (type == TYPE.WAY)
                     {
                         p.airPoints = new Vector3[4];
+                        p.screenPoints = new Vector3[4];
                         p.airPoints[0] = p.pos + new Vector3(-0.5f,0.5f,-0.5f);
                         p.airPoints[1] = p.pos + new Vector3(0.5f, 0.5f,-0.5f);
                         p.airPoints[2] = p.pos + new Vector3(-0.5f, 0.5f,0.5f);
@@ -185,14 +198,16 @@ public class Block : MonoBehaviour {
             Vector3 p0 = wp.hitPoint;
             for (int j = 0 ,c2 = wp.connecteds.Count; j < c2; j++)
             {
-                Gizmos.DrawLine(wp.hitPoint,wp.connecteds[j].hitPoint);
+               // Gizmos.DrawLine(wp.hitPoint,wp.connecteds[j].hitPoint);
                 Gizmos.color = wayPointColor;
                 
                 Vector3 p1 = wp.connecteds[j].hitPoint;
 
-                Gizmos.DrawLine(wp.hitPoint, wp.connecteds[j].hitPoint);
-                //Gizmos.DrawSphere((wp.hitPoint + wp.connecteds[j].hitPoint) *0.5f, 0.1f);
-           
+                //Gizmos.DrawLine(wp.hitPoint, wp.connecteds[j].hitPoint);
+                
+                Gizmos.DrawSphere(Vector3.Lerp(wp.hitPoint, wp.connecteds[j].hitPoint, 0.35f), 0.08f);
+                Gizmos.DrawSphere(Vector3.Lerp(wp.hitPoint, wp.connecteds[j].hitPoint, 0.65f), 0.08f);
+
             }
         }
         
